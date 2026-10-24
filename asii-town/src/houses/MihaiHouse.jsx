@@ -15,11 +15,11 @@ const NEEDS_POWER = ['tank', 'champ', 'desk', 'galaxy', 'drawer'];
   Ultimele din listă stau deasupra. Ajustează aici, cu butonul „Debug” activ.
 */
 const HOTSPOTS = [
-  { key: 'tank', id: 'tank', label: 'Afiș cu un tanc de luptă pe un câmp de luptă sci-fi', x: 6, y: 22, w: 18, h: 46 },
+  { key: 'champ', id: 'champ', label: 'Afiș League of Legends cu Evelynn', x: 6, y: 22, w: 18, h: 46 },
   { key: 'galaxy', id: 'galaxy', label: 'Hublou cu o galaxie spirală', x: 44, y: 10, w: 43, h: 19 },
   { key: 'desk-screens', id: 'desk', label: 'Ecranele de diagnostic ale biroului de robotică', x: 41, y: 33, w: 16.5, h: 17 },
   { key: 'desk', id: 'desk', label: 'Birou de robotică cu microcontroller, senzori și un mic robot', x: 28, y: 50, w: 27, h: 31, zoom: { x: 28, y: 33, w: 29, h: 48 } },
-  { key: 'champ', id: 'champ', label: 'Afiș cu un campion fantasy', x: 25, y: 29, w: 15, h: 28 },
+  { key: 'tank', id: 'tank', label: 'Afiș cu un tanc Tiger I', x: 25, y: 29, w: 15, h: 28 },
   { key: 'frame', id: 'frame', label: 'Tablou încadrat cu un simbol tehnologic', x: 60, y: 38, w: 7.5, h: 16 },
   { key: 'bed', id: 'bed', label: 'Pat cu lenjerie albastră cu stele', x: 70, y: 53, w: 30, h: 47 },
   { key: 'shelves', id: 'shelves', label: 'Rafturi cu piese și obiecte de colecție', x: 87.5, y: 30, w: 12.5, h: 28.5 },
@@ -222,18 +222,18 @@ export default function MihaiHouse({ member, progress, dispatch, onExit, notify,
         return (
           <>
             <span className="tag">AFIȘ · SECTOR HANGAR</span>
-            <h2>Colosul de oțel</h2>
-            <p>Un colos de oțel nu câștigă prin zgomot. Câștigă prin unghi, prin răbdare și printr-o lovitură pusă exact unde trebuie. Cine privește acest afiș prețuiește planul dinaintea focului.</p>
-            <p style={{ color: '#ff8a2a' }}>Precizie · Strategie · Răbdare</p>
+            <h2>Tiger I</h2>
+            <p>Aproape o mie de ore au fost investite în arta de a conduce un Tiger I, de a aștepta unghiul perfect și de a spune „încă o rundă” după ce toată lumea credea că sesiunea s-a terminat. Lovitura bună cere strategie. Încă o lovitură bună cere probabil prea mult timp liber.</p>
+            <p style={{ color: '#ff8a2a' }}>Tancuri · Strategie · Încă o rundă</p>
           </>
         );
       case 'champ':
         return (
           <>
             <span className="tag">AFIȘ · SECTOR ARENĂ</span>
-            <h2>Străjerul de cristal</h2>
-            <p>O siluetă în armură luminoasă, cu o lume întreagă în spate. Pe hărțile competitive, un personaj bine desenat cântărește cât o strategie bine jucată: cine îl privește vede deopotrivă arta și arena.</p>
-            <p style={{ color: '#ff8a2a' }}>Design · Personaje · Lumi competitive</p>
+            <h2>League of Legends · Evelynn</h2>
+            <p>Peste trei mii de ore în arenă înseamnă că afișul nu este doar decor: este bait strategic pentru ochii băieților din cameră. După ce atenția a fost capturată, urmează partea „perfect calculată”: încă un meci, care evident este ultimul.</p>
+            <p style={{ color: '#ff8a2a' }}>Personaje atractive · 3000+ ore · Ultimul meci</p>
           </>
         );
       case 'desk':

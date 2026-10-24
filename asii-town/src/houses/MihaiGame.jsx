@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
-import './mihai.css';
 
 /*
   Simulator de luptă (tancuri fictive, teren sci-fi, fără asset-uri externe).
