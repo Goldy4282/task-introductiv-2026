@@ -15,7 +15,7 @@ const NEEDS_POWER = ['tank', 'champ', 'desk', 'galaxy', 'drawer'];
   Ultimele din listă stau deasupra. Ajustează aici, cu butonul „Debug” activ.
 */
 const HOTSPOTS = [
-  { key: 'champ', id: 'champ', label: 'Afiș League of Legends cu Evelynn', x: 6, y: 22, w: 18, h: 46 },
+  { key: 'champ', id: 'champ', label: 'Afiș League of Legends cu Evelynn', x: 6, y: 22, w: 18, h: 46, modalWidth: 360 },
   { key: 'galaxy', id: 'galaxy', label: 'Hublou cu o galaxie spirală', x: 44, y: 10, w: 43, h: 19 },
   { key: 'desk-screens', id: 'desk', label: 'Ecranele de diagnostic ale biroului de robotică', x: 41, y: 33, w: 16.5, h: 17 },
   { key: 'desk', id: 'desk', label: 'Birou de robotică cu microcontroller, senzori și un mic robot', x: 28, y: 50, w: 27, h: 31, zoom: { x: 28, y: 33, w: 29, h: 48 } },
@@ -55,7 +55,7 @@ function ZoomView({ id }) {
       aria-label="Detaliu decupat din imaginea camerei"
       style={{
         aspectRatio: ratio,
-        width: `min(100%, ${Math.round(200 * ratio)}px)`,
+        width: `min(100%, ${r.modalWidth || Math.round(200 * ratio)}px)`,
         backgroundImage: `url(${IMG})`,
         backgroundSize: `${10000 / r.w}% ${10000 / r.h}%`,
         backgroundPosition: `${r.w < 100 ? (r.x / (100 - r.w)) * 100 : 0}% ${r.h < 100 ? (r.y / (100 - r.h)) * 100 : 0}%`,

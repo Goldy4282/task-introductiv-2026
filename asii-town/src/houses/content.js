@@ -19,18 +19,18 @@ export const MEMBERS = [
  },
  {
     id:'maker',
-    name:'Colegul 2',
-    title:'Casa inventatorului',
-    color:'#bfa478',
+    name:'Mihai',
+    title:'Camera inginerului cosmic',
+    color:'#22e6ff',
     fragment:'13',
     hint:'Un proiect pornește de la idee, apoi schiță, prototip și test.',
-    quote:'Orice idee merită un prim prototip.',
+    quote:'Orice sistem interesant începe ca un prototip.',
     objects:[
-        ['Schița','Un proiect pornește de la idee, continuă cu schița, prototipul și testul.'],
-        ['Trusa','Păstrează piesele mici în cutii mari.'],
-        ['Prototipul','Încearcă din nou când prima versiune nu funcționează.'],
-        ['Ceasul','Uitarea timpului este semnul unui proiect interesant.'],
-        ['Caietul','Lasă mereu loc pe pagină pentru încă o idee.']
+        ['Afișul cu Evelynn','Un afiș ales strategic pentru ochii băieților din cameră.'],
+        ['Tiger I','Aproape o mie de ore de strategie, unghiuri și încă o rundă.'],
+        ['Biroul de robotică','Fire, senzori și un prototip care încă învață să meargă drept.'],
+        ['Panoul cu galaxie','Unele proiecte încep privind spre lucruri încă neinventate.'],
+        ['Patul cu stele','Un episod SF neterminat poate amâna somnul cu ore întregi.']
     ]
  },
  {
