@@ -1,0 +1,207 @@
+/* ============ ASII Town · Camera inginerului cosmic ============ */
+.mh-root {
+  --c: #22e6ff;
+  --b: #2f6bff;
+  --o: #ff8a2a;
+  --bg: #030612;
+  --panel: rgba(8, 20, 44, 0.78);
+  --line: rgba(34, 230, 255, 0.35);
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #cfeeff;
+  font-family: 'Courier New', ui-monospace, monospace;
+  background:
+    radial-gradient(ellipse 60% 40% at 78% 20%, rgba(80, 60, 220, 0.28), transparent 70%),
+    radial-gradient(ellipse 45% 35% at 15% 85%, rgba(20, 120, 255, 0.18), transparent 70%),
+    linear-gradient(180deg, #02040d 0%, #04102a 100%);
+}
+.mh-root *, .mh-root *::before, .mh-root *::after { box-sizing: border-box; }
+
+/* stele */
+.mh-stars, .mh-stars::after {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 18%, #fff, transparent),
+    radial-gradient(1px 1px at 33% 72%, #9fe9ff, transparent),
+    radial-gradient(1.5px 1.5px at 58% 34%, #fff, transparent),
+    radial-gradient(1px 1px at 81% 62%, #bcd4ff, transparent),
+    radial-gradient(1px 1px at 91% 12%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 47% 90%, #9fe9ff, transparent),
+    radial-gradient(1px 1px at 5% 55%, #fff, transparent),
+    radial-gradient(1px 1px at 70% 85%, #fff, transparent);
+  background-size: 420px 420px;
+}
+.mh-stars::after { content: ''; background-size: 290px 290px; background-position: 90px 40px; animation: mh-twinkle 4s ease-in-out infinite; }
+@keyframes mh-twinkle { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+
+.mh-spark {
+  position: absolute; bottom: -10px; border-radius: 50%;
+  background: var(--c); box-shadow: 0 0 8px var(--c);
+  pointer-events: none; opacity: 0;
+  animation: mh-rise linear infinite;
+}
+@keyframes mh-rise { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: .8; } 100% { transform: translateY(-105vh); opacity: 0; } }
+
+/* ---- bara de sus ---- */
+.mh-top {
+  position: relative; z-index: 5;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;
+  padding: 10px 16px;
+  background: linear-gradient(180deg, rgba(6, 18, 40, .95), rgba(6, 18, 40, .6));
+  border-bottom: 1px solid var(--line);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 8px));
+  padding-bottom: 16px;
+}
+.mh-title { display: flex; flex-direction: column; min-width: 0; flex: 1 1 220px; }
+.mh-title small { color: var(--o); letter-spacing: .25em; font-size: 10px; }
+.mh-title h1 { margin: 0; font-size: clamp(15px, 3.4vw, 22px); color: var(--c); text-shadow: 0 0 12px rgba(34, 230, 255, .6); letter-spacing: .05em; }
+.mh-status { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 6px 12px; border: 1px solid var(--line); background: rgba(0, 0, 0, .35); }
+.mh-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--o); box-shadow: 0 0 8px var(--o); animation: mh-pulse 1.4s infinite; }
+.mh-on .mh-dot { background: #3dff9a; box-shadow: 0 0 8px #3dff9a; }
+@keyframes mh-pulse { 50% { transform: scale(.55); opacity: .5; } }
+.mh-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.mh-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: inherit; font-size: 12px; letter-spacing: .06em; cursor: pointer;
+  color: var(--c); background: rgba(34, 230, 255, .08);
+  border: 1px solid var(--c); padding: 8px 12px;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  transition: background .2s, box-shadow .2s, transform .1s;
+}
+.mh-btn:hover { background: rgba(34, 230, 255, .22); box-shadow: 0 0 14px rgba(34, 230, 255, .5); }
+.mh-btn:active { transform: translateY(1px); }
+.mh-btn:disabled { opacity: .4; cursor: not-allowed; }
+.mh-btn.hot { color: var(--o); border-color: var(--o); background: rgba(255, 138, 42, .1); }
+.mh-btn.hot:hover { background: rgba(255, 138, 42, .25); box-shadow: 0 0 14px rgba(255, 138, 42, .5); }
+
+/* ---- scena: imagine full-screen + hotspot-uri ---- */
+@keyframes mh-in { from { opacity: 0; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: none; } }
+.mh-hint { position: relative; z-index: 3; text-align: center; font-size: 12px; padding: 6px 12px; color: var(--o); letter-spacing: .08em; }
+.mh-stagewrap { position: relative; z-index: 2; flex: 1; min-height: 0; display: grid; place-items: center; container-type: size; }
+.mh-scene {
+  position: relative; aspect-ratio: 16 / 9; overflow: hidden;
+  width: min(100cqw, calc(100cqh * 16 / 9));
+  background: #02060f; border: 1px solid var(--line);
+  box-shadow: 0 0 40px rgba(34, 230, 255, .18);
+}
+.mh-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; user-select: none; -webkit-user-drag: none; transition: filter .8s; }
+.mh-off .mh-bg { filter: brightness(.5) saturate(.55); }
+.mh-on .mh-bg { filter: brightness(1.04) saturate(1.1); }
+.mh-vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(1, 4, 12, .55)); transition: background .8s; }
+.mh-off .mh-vignette { background: radial-gradient(ellipse at 50% 50%, rgba(1, 4, 12, .15) 30%, rgba(1, 4, 12, .72)); }
+.mh-flicker { position: absolute; inset: 0; pointer-events: none; opacity: 0; mix-blend-mode: screen;
+  background: radial-gradient(circle at 46% 48%, rgba(34, 230, 255, .22), transparent 18%), radial-gradient(circle at 60% 50%, rgba(34, 230, 255, .14), transparent 14%), radial-gradient(circle at 65% 20%, rgba(130, 110, 255, .2), transparent 30%); }
+.mh-on .mh-flicker { opacity: 1; animation: mh-flick 3.6s ease-in-out infinite; }
+@keyframes mh-flick { 0%, 100% { opacity: .55; } 50% { opacity: 1; } 52% { opacity: .7; } 54% { opacity: 1; } }
+.mh-scan { position: absolute; left: 0; right: 0; top: 0; height: 3px; z-index: 8; pointer-events: none; background: linear-gradient(90deg, transparent, var(--c), transparent); box-shadow: 0 0 24px 8px rgba(34, 230, 255, .5); animation: mh-sweep 2.2s ease-in-out forwards; }
+@keyframes mh-sweep { from { top: 0; opacity: 1; } to { top: 100%; opacity: .2; } }
+
+/* hotspot-uri: transparente, centrate pe coordonate în %, cu suprafață minimă de atingere */
+.mh-hot {
+  position: absolute; z-index: 4; transform: translate(-50%, -50%);
+  min-width: 44px; min-height: 44px; padding: 0; margin: 0; border: 0;
+  background: transparent; border-radius: 10px; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; transition: box-shadow .2s, background .2s;
+}
+.mh-hot:hover { box-shadow: inset 0 0 0 2px rgba(34, 230, 255, .7), 0 0 22px rgba(34, 230, 255, .45); background: rgba(34, 230, 255, .06); }
+.mh-hot:focus { outline: none; }
+.mh-hot:focus-visible { box-shadow: inset 0 0 0 2px var(--o), 0 0 22px rgba(255, 138, 42, .5); }
+.mh-hot.locked { cursor: not-allowed; background: radial-gradient(ellipse at center, rgba(2, 6, 16, .5), rgba(2, 6, 16, .2) 70%, transparent 100%); }
+.mh-hot.ping { animation: mh-ping 1s ease-out 3; }
+@keyframes mh-ping { 0% { box-shadow: inset 0 0 0 2px var(--o), 0 0 0 0 rgba(255, 138, 42, .6); } 100% { box-shadow: inset 0 0 0 2px transparent, 0 0 28px 14px rgba(255, 138, 42, 0); } }
+.mh-hot.glow { background: radial-gradient(ellipse at center, rgba(61, 255, 154, .3), transparent 70%); animation: mh-glow 1.8s ease-in-out infinite; }
+@keyframes mh-glow { 50% { opacity: .4; } }
+
+/* panoul de întreținere (drag & drop) */
+.mh-panel {
+  position: absolute; z-index: 6; min-width: 44px; min-height: 44px; display: grid; place-items: center; color: #ffcf99;
+  background: repeating-linear-gradient(45deg, #2a2f3d 0 8px, #8a4a14 8px 14px);
+  border: 2px solid var(--o); border-radius: 6px; cursor: grab; touch-action: none; user-select: none;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .6); transition: opacity .5s;
+}
+.mh-panel:active { cursor: grabbing; }
+.mh-panel:focus-visible { outline: 2px solid var(--c); outline-offset: 2px; }
+.mh-panel .ic { display: grid; padding: 5px; border-radius: 50%; background: rgba(2, 6, 16, .85); }
+.mh-panel.snap { transition: transform .25s, opacity .5s; }
+.mh-panel.done { opacity: 0; pointer-events: none; transition: transform .25s, opacity .6s .2s; }
+
+/* mod debug */
+.mh-debug .mh-hot { outline: 2px dashed var(--o); background: rgba(255, 138, 42, .14); }
+.mh-debug .mh-hot::after { content: attr(data-debug); position: absolute; left: 2px; top: 2px; font-size: 10px; line-height: 1.2; color: #fff; background: rgba(0, 0, 0, .75); padding: 1px 3px; pointer-events: none; text-align: left; white-space: nowrap; }
+.mh-debug .mh-panel { outline: 2px dashed #3dff9a; }
+.mh-debug .mh-panel.done { opacity: .35; }
+
+.mh-imgfail { position: absolute; inset: 0; z-index: 9; display: grid; place-items: center; text-align: center; padding: 16px; line-height: 1.6; font-size: 13px; color: var(--o); background: #02060f; }
+
+/* detaliu decupat în modal */
+.mh-zoom { position: relative; margin: 0 auto 14px; background-repeat: no-repeat; background-color: #02060f; border: 1px solid var(--line); box-shadow: inset 0 0 20px rgba(0, 0, 0, .5); }
+.mh-zoom::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(34, 230, 255, .06) 0 1px, transparent 1px 4px); }
+
+/* ---- modal ---- */
+.mh-modal-bg { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: rgba(1, 4, 12, .82); backdrop-filter: blur(4px); animation: mh-fade .25s; }
+@keyframes mh-fade { from { opacity: 0; } }
+.mh-modal { position: relative; width: min(560px, 100%); max-height: 90vh; overflow: auto; padding: 22px 20px 20px; background: linear-gradient(160deg, #081a3a, #050c20); border: 1px solid var(--c); box-shadow: 0 0 40px rgba(34, 230, 255, .25); animation: mh-in .35s both; }
+.mh-modal::before, .mh-modal::after { content: ''; position: absolute; width: 22px; height: 22px; border: 3px solid var(--o); }
+.mh-modal::before { top: -3px; left: -3px; border-right: 0; border-bottom: 0; } .mh-modal::after { bottom: -3px; right: -3px; border-left: 0; border-top: 0; }
+.mh-modal h2 { margin: 0 0 4px; color: var(--c); font-size: 18px; letter-spacing: .06em; }
+.mh-modal .tag { font-size: 10px; letter-spacing: .25em; color: var(--o); margin-bottom: 12px; display: block; }
+.mh-modal p { line-height: 1.6; font-size: 14px; margin: 0 0 12px; }
+.mh-x { position: absolute; top: 10px; right: 10px; background: none; border: 1px solid var(--line); color: var(--c); cursor: pointer; padding: 4px; display: grid; }
+.mh-term { background: #02060f; border: 1px solid var(--line); padding: 10px; min-height: 90px; font-size: 12px; line-height: 1.7; color: #7dffb4; margin-bottom: 12px; }
+.mh-cipher { letter-spacing: .15em; color: var(--o); word-break: break-all; }
+.mh-fragment { border-left: 3px solid #3dff9a; padding: 8px 12px; background: rgba(61, 255, 154, .07); color: #c9ffe0; font-size: 14px; line-height: 1.6; margin-bottom: 12px; }
+
+/* ---- toast ---- */
+.mh-toasts { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 90; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; width: min(92vw, 420px); }
+.mh-toast { width: 100%; padding: 10px 14px; font-size: 13px; background: rgba(4, 14, 34, .95); border: 1px solid var(--c); color: var(--c); box-shadow: 0 0 18px rgba(34, 230, 255, .35); animation: mh-in .3s both; }
+.mh-toast.warn { border-color: var(--o); color: var(--o); box-shadow: 0 0 18px rgba(255, 138, 42, .35); }
+.mh-toast.ok { border-color: #3dff9a; color: #3dff9a; box-shadow: 0 0 18px rgba(61, 255, 154, .35); }
+
+/* ---- poarta hangarului ---- */
+.mh-gatewrap { position: fixed; inset: 0; z-index: 70; background: #02040d; }
+.mh-gate { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 80; pointer-events: none; background: repeating-linear-gradient(0deg, #1a2438 0 28px, #222d45 28px 30px); border: 2px solid var(--o); animation: mh-open 1s .15s ease-in forwards; }
+.mh-gate.l { left: 0; --d: -100%; } .mh-gate.r { right: 0; --d: 100%; }
+@keyframes mh-open { to { transform: translateX(var(--d)); } }
+
+/* ---- responsive ---- */
+@media (max-width: 560px) {
+  .mh-top { padding: 8px 10px 14px; }
+  .mh-btn { padding: 7px 9px; font-size: 11px; }
+  .mh-hint { font-size: 11px; padding: 4px 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .mh-root *, .mh-root *::before, .mh-root *::after { animation-duration: .01s !important; animation-iteration-count: 1 !important; } }
+
+/* ================= MINI-JOC ================= */
+.mg-root { position: fixed; inset: 0; z-index: 75; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 12px; overflow: auto; color: #cfeeff; font-family: 'Courier New', ui-monospace, monospace; background: radial-gradient(ellipse at 50% 0, #0b1c42, #02040d 70%); animation: mh-fade .4s; }
+.mg-root *, .mg-root *::before, .mg-root *::after { box-sizing: border-box; }
+.mg-hud { width: min(100%, 680px); display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.mg-cell { border: 1px solid rgba(34, 230, 255, .35); background: rgba(6, 18, 40, .8); padding: 6px 10px; font-size: 11px; letter-spacing: .1em; clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
+.mg-cell b { display: block; font-size: 18px; color: #22e6ff; letter-spacing: .04em; }
+.mg-cell.o b { color: #ff8a2a; }
+.mg-bar { height: 8px; margin-top: 4px; background: #08142e; border: 1px solid rgba(34, 230, 255, .35); }
+.mg-bar i { display: block; height: 100%; background: linear-gradient(90deg, #ff8a2a, #22e6ff); transition: width .08s linear; }
+.mg-field { position: relative; width: min(100%, 680px); border: 2px solid #22e6ff; box-shadow: 0 0 28px rgba(34, 230, 255, .3); line-height: 0; background: #050d22; }
+.mg-field canvas { width: 100%; height: auto; display: block; touch-action: none; cursor: crosshair; }
+.mg-msg { position: absolute; left: 0; right: 0; top: 10px; text-align: center; line-height: 1.2; color: #ff8a2a; font-weight: bold; letter-spacing: .15em; text-shadow: 0 0 10px #ff8a2a; pointer-events: none; animation: mh-in .25s both; }
+.mg-win { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; line-height: 1.5; padding: 16px; background: rgba(2, 8, 22, .88); animation: mh-fade .4s; }
+.mg-win h2 { color: #3dff9a; margin: 0 0 8px; letter-spacing: .12em; text-shadow: 0 0 14px #3dff9a; }
+.mg-win p { margin: 0 0 14px; font-size: 14px; max-width: 420px; }
+.mg-help { font-size: 11px; opacity: .75; text-align: center; letter-spacing: .05em; max-width: 680px; }
+.mg-touch { display: none; width: min(100%, 680px); justify-content: space-between; align-items: center; padding: 4px 6px; }
+.mg-pad { display: grid; grid-template-columns: repeat(3, 54px); grid-template-rows: repeat(2, 54px); gap: 6px; }
+.mg-pad .up { grid-column: 2; grid-row: 1; } .mg-pad .left { grid-column: 1; grid-row: 2; } .mg-pad .down { grid-column: 2; grid-row: 2; } .mg-pad .right { grid-column: 3; grid-row: 2; }
+.mg-key { font: inherit; font-size: 20px; color: #22e6ff; background: rgba(34, 230, 255, .1); border: 1px solid #22e6ff; touch-action: none; user-select: none; -webkit-user-select: none; cursor: pointer; }
+.mg-key:active { background: rgba(34, 230, 255, .35); }
+.mg-fire { width: 96px; height: 96px; border-radius: 50%; color: #ff8a2a; border-color: #ff8a2a; background: rgba(255, 138, 42, .12); font-size: 14px; letter-spacing: .1em; }
+.mg-fire:active { background: rgba(255, 138, 42, .4); }
+@media (pointer: coarse), (max-width: 700px) { .mg-touch { display: flex; } }
+
+/* ---- mini-joc: ajustări pentru armură / valuri / eșec ---- */
+.mg-hud { grid-template-columns: repeat(4, 1fr); }
+.mg-hearts { color: #ff4d6d !important; letter-spacing: .12em; text-shadow: 0 0 8px rgba(255, 77, 109, .6); }
+.mg-lose h2 { color: #ff4d6d; text-shadow: 0 0 14px #ff4d6d; }
+@media (max-width: 560px) { .mg-hud { grid-template-columns: 1fr 1fr; } }

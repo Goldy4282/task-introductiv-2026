@@ -1,9 +1,11 @@
 import ExampleHouse from './ExampleHouse';
+import MihaiHouse from './MihaiHouse';
+import MihaiGame from './MihaiGame';
 import {MEMBERS} from './content';
 // Each participant imports their own Room and Game here.
 export const HOUSE_MODULES={
  guest:{Room:ExampleHouse,Game:null},
- maker:{Room:ExampleHouse,Game:null},
+ maker:{Room:MihaiHouse,Game:MihaiGame},
  reader:{Room:ExampleHouse,Game:null},
  artist:{Room:ExampleHouse,Game:null},
 };
