@@ -128,3 +128,27 @@ Rulează `npm run dev`, intră în casa ta și verifică obiectele, dialogul, in
 Rulează `npm test` și `npm run build`. Pentru a reseta progresul de dezvoltare, șterge doar cheia `asii-town-adventure-v3` din localStorage pentru această aplicație. Versiunea v3 nu reutilizează victoriile jocurilor demonstrative eliminate.
 
 Asseturile comune ale UI-ului sunt în `src/assets/ui`, iar clasele reutilizabile sunt `rpg-panel`, `rpg-button` și `interior-room`. Pachetul este folosit conform licenței incluse; distribuirea fișierelor sale ca pachet separat sau într-un repository public este restricționată de autor.
+
+## Imagini pentru obiecte
+
+Obiectele din `PersonalRoom`, `HouseInterior` și replicile din Camera Secretă folosesc aceeași componentă `ObjectImage`. Fotografia apare în cameră și în dialogul de detalii. Se păstrează proporțiile; imaginile lipsă sau care nu pot fi încărcate afișează „Fără imagine”, fără emoji sau iconițe înlocuitoare.
+
+Pentru structura scurtă din `content.js`, adaugă URL-ul ca al treilea element:
+
+```js
+// Pune fișierul în public/objects/busola.jpg.
+['Busola', 'Descriere despre proprietar.', '/objects/busola.jpg']
+```
+
+Poți folosi și obiecte cu proprietăți explicite:
+
+```js
+{
+  id: 'busola',
+  label: 'Busola',
+  description: 'Descriere despre proprietar.',
+  image: {src: '/objects/busola.jpg', alt: 'Busola de pe birou'}
+}
+```
+
+Pentru fișiere din `src/assets`, importă imaginea în modulul datelor și folosește variabila importată drept `image` sau `image.src`. Nu este necesară declararea dimensiunilor pentru fotografii obișnuite. Pentru un sprite decupat, folosește în continuare `{src, x, y, w, h, sheetWidth, sheetHeight}`. `pixel: true` activează afișarea pixelată pentru o imagine obișnuită; fotografiile rămân netezite implicit.
