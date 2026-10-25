@@ -35,18 +35,19 @@ export const MEMBERS = [
  },
  {
     id:'reader',
-    name:'Colegul 3',
-    title:'Casa cititorului',
+    name:'Sughit',
+    title:'Casa alchimistului',
     color:'#a7a1b7',
-    fragment:'LUNA',
-    hint:'Semnul de carte are o lună argintie. Aceasta este alegerea preferată.',
-    quote:'O pagină poate deschide o lume.',
+    fragment:'A♠',
+    fragmentLabel:'As de pică · A♠',
+    hint:'Pe medalia de la olimpiadă este gravată o lună argintie. Aceasta este alegerea preferată.',
+    quote:'Orice experiment lasă o poveste, chiar și o placă arsă.',
     objects:[
-        ['Cartea','Caută povești care schimbă felul în care privește lumea.'],
-        ['Semnul de carte','Are o lună argintie. Acesta este simbolul preferat.'],
-        ['Ceaiul','O lectură lungă începe cu o cană de ceai.'],
-        ['Lampa','Lumina caldă rămâne aprinsă până la ultimul capitol.'],
-        ['Jurnalul de lectură','Adună ideile care merită păstrate.']
+        ['Medalia de la olimpiadă','Anul urmator s-a scos bursa de olimpici. Pe verso este gravată o lună argintie.'],
+        ['Placa Arduino arsă','Rezultatul lăsării aparatului de sudură prea aproape de plăcuță, pentru prea mult timp..'],
+        ['Idiotul','Romanul lui F. M. Dostoievski, un cadou interesant.'],
+        ['Inserter','The factory must grow!'],
+        ['Baner For Honor','Hmm, heby.']
     ]
  },
  {
