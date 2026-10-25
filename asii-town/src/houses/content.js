@@ -58,11 +58,10 @@ export const MEMBERS = [
     hint:'Paleta pune soarele lângă pensulă și luna lângă creion.',
     quote:'Culoarea spune ceea ce cuvintele încă nu știu.',
     objects:[
-        ['Paleta','Soarele stă lângă pensulă, iar luna lângă creion.'],
-        ['Pensula','Transformă o pată într-un început de poveste.'],
-        ['Schițele','Desenează idei înainte să le explice.'],
-        ['Aparatul foto','Observă detaliile pe lângă care ceilalți trec.'],
-        ['Albumul','Păstrează culori din fiecare anotimp.']
+        ['Butoi cu rachiu','Soarele stă lângă pensulă, iar luna lângă creion.'],
+        ['Tabloul lui PMS','Transformă o pată într-un început de poveste.'],
+        ['Mimi','Desenează idei înainte să le explice.'],
+        ['Lampa','Observă detaliile pe lângă care ceilalți trec.']
     ]
  },
 ];

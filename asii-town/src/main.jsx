@@ -1,1 +1,1 @@
-import React from 'react';import{createRoot}from'react-dom/client';import App from './App';import './index.css';import './houses/mihai.css';createRoot(document.getElementById('root')).render(<React.StrictMode><App/></React.StrictMode>);
+import React from 'react';import{createRoot}from'react-dom/client';import App from './App';import './index.css';import './houses/mihai-room/mihai.css';createRoot(document.getElementById('root')).render(<React.StrictMode><App/></React.StrictMode>);
