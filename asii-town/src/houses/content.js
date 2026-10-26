@@ -22,7 +22,8 @@ export const MEMBERS = [
     name:'Mihai',
     title:'Camera inginerului cosmic',
     color:'#22e6ff',
-    fragment:'13',
+    fragment:'Banană',
+    fragmentLabel:'Banană',
     hint:'Un proiect pornește de la idee, apoi schiță, prototip și test.',
     quote:'Orice sistem interesant începe ca un prototip.',
     objects:[
@@ -38,8 +39,8 @@ export const MEMBERS = [
     name:'Sughit',
     title:'Casa alchimistului',
     color:'#a7a1b7',
-    fragment:'A♠',
-    fragmentLabel:'As de pică · A♠',
+    fragment:'Placă Arduino reparată',
+    fragmentLabel:'Placă Arduino reparată',
     hint:'Pe medalia de la olimpiadă este gravată o lună argintie. Aceasta este alegerea preferată.',
     quote:'Orice experiment lasă o poveste, chiar și o placă arsă.',
     objects:[
@@ -47,7 +48,8 @@ export const MEMBERS = [
         ['Placa Arduino arsă','Rezultatul lăsării aparatului de sudură prea aproape de plăcuță, pentru prea mult timp..'],
         ['Idiotul','Romanul lui F. M. Dostoievski, un cadou interesant.'],
         ['Inserter','The factory must grow!'],
-        ['Baner For Honor','Hmm, heby.']
+        ['Baner For Honor','Hmm, heby.'],
+        ['Legitimația de elev CFR','O legitimație de elev pentru călătoriile cu trenul, uitată pe podeaua camerei.']
     ]
  },
  {
@@ -55,7 +57,8 @@ export const MEMBERS = [
     name:'Colegul 4',
     title:'Casa artistului',
     color:'#bc8c83',
-    fragment:'SOARE',
+    fragment:'Bere Ursus',
+    fragmentLabel:'Bere Ursus',
     hint:'Paleta pune soarele lângă pensulă și luna lângă creion.',
     quote:'Culoarea spune ceea ce cuvintele încă nu știu.',
     objects:[

@@ -4,7 +4,7 @@ import ObjectImage from '../../components/ObjectImage';
 import {assets} from '../../assets';
 import {getRoomObjects} from '../roomObjects';
 import {drawWorkshop, FURNITURE_TILES} from './workshop';
-import BlackjackGame, {Card} from './BlackjackGame';
+import ArduinoGame from './ArduinoGame';
 
 // PNG-urile adăugate ulterior sunt preluate automat și incluse în build.
 const pictures = import.meta.glob('../../assets/sughit-house/*.png', {eager:true, query:'?url', import:'default'});
@@ -14,7 +14,8 @@ const PROPS = [
   {file:'idiotul.png', x:1, y:5, symbol:'ИДИОТ', color:'#985b57'},
   {file:'inserter-factorio.png', x:10, y:6, symbol:'↗', color:'#d79b40'},
   {file:'baner-for-honor.png', x:10, y:2, symbol:'⚔', color:'#6779a5'},
-  {id:'blackjack', x:6, y:5, symbol:'A♠', color:'#387154'},
+  {file:'legitimatie-elev-cfr.png', x:4, y:6, symbol:'CFR', color:'#d7dfcf'},
+  {id:'uv-flashlight', x:7, y:6},
 ];
 const T=48, COLS=13, ROWS=9, W=COLS*T, H=ROWS*T;
 const key=p=>`${p.x},${p.y}`;
@@ -42,15 +43,24 @@ function pathTo(start, goal) {
 }
 const imageFor=prop=>pictures[`../../assets/sughit-house/${prop.file}`];
 
-export default function SughitHouse({member,onExit,onGameWin,progress,Game=BlackjackGame}) {
+export default function SughitHouse({member,onExit,onGameWin,progress,Game=ArduinoGame}) {
   const canvas=useRef(null), callbacks=useRef({}), paused=useRef(false);
   const [detail,setDetail]=useState(null),[near,setNear]=useState(-1),[game,setGame]=useState(false);
   const [reward,setReward]=useState(false);
+  const [uv,setUv]=useState(false);
+  const uvRef=useRef(false);
+  function toggleUv(){uvRef.current=!uvRef.current;setUv(uvRef.current);}
   const rewardPending=useRef(false);
   function winGame(){rewardPending.current=true;onGameWin?.();}
   function closeGame(){setGame(false);if(rewardPending.current){rewardPending.current=false;setReward(true);}}
-  const objects=[...getRoomObjects(member).map((object,i)=>({...object,image:imageFor(PROPS[i])})),{id:'blackjack',label:'Masa de blackjack'}];
-  callbacks.current={onExit,open:i=>PROPS[i].id==='blackjack'?setGame(true):setDetail(objects[i])};
+  const objects=[...getRoomObjects(member).map((object,i)=>({...object,image:imageFor(PROPS[i])})),{id:'uv-flashlight',label:uv?'Lanterna UV · stinge':'Lanterna UV · aprinde'}];
+  callbacks.current={onExit,openWindow:()=>{
+    paused.current=true;
+    setDetail({label:'Fereastra',description:'Da, afară este zi, dar aici se schimbă brusc în noapte.',hideImage:true});
+  },open:i=>{
+    if(PROPS[i].id==='uv-flashlight'){toggleUv();return;}
+    if(PROPS[i].file==='arduino-ars.png')setGame(true);else setDetail(objects[i]);
+  }};
   paused.current=Boolean(detail||game||reward);
 
   useEffect(()=>{
@@ -59,7 +69,7 @@ export default function SughitHouse({member,onExit,onGameWin,progress,Game=Black
     const images={actor:load(assets.actor)};
     const props=PROPS.map(prop=>imageFor(prop)?load(imageFor(prop)):null);
     let player={x:6,y:7}, position={x:6.5*T,y:7.5*T}, direction=2, path=[], pending=-1, lastNear=-1;
-    let frame, last=0, elapsed=0, animation=0, target=null;
+    let frame, last=0, elapsed=0, animation=0, target=null,windowZoneEntered=false;
     const keys=new Set();
     function down(e) {
       if(paused.current)return;
@@ -73,6 +83,11 @@ export default function SughitHouse({member,onExit,onGameWin,progress,Game=Black
       if(paused.current)return;
       const rect=el.getBoundingClientRect();
       const tile={x:Math.floor((e.clientX-rect.left)*W/rect.width/T),y:Math.floor((e.clientY-rect.top)*H/rect.height/T)};
+      if(tile.y<2&&tile.x>=5&&tile.x<=7){
+        if(!target&&player.y===2&&player.x>=5&&player.x<=7)callbacks.current.openWindow();
+        else path=pathTo(player,{x:6,y:2});
+        pending=-1;return;
+      }
       pending=PROPS.findIndex(prop=>key(prop)===key(tile));
       if(pending>=0) {
         if(distance(player,tile)===1&&!target){callbacks.current.open(pending);pending=-1;return;}
@@ -104,21 +119,55 @@ export default function SughitHouse({member,onExit,onGameWin,progress,Game=Black
           if(position.x===target.x&&position.y===target.y) {
             target=null;
             if(player.x===6&&player.y===8){callbacks.current.onExit();return;}
+            const atWindow=player.y===2&&player.x>=5&&player.x<=7;
+            if(atWindow&&!windowZoneEntered)callbacks.current.openWindow();
+            windowZoneEntered=atWindow;
           }
         }
         const n=nearby(player);if(n!==lastNear){lastNear=n;setNear(n);}
       }
       ctx.imageSmoothingEnabled=false;
       drawWorkshop(ctx,time);
+      if(uvRef.current){
+        ctx.save();
+        ctx.fillStyle='rgba(39, 12, 83, 0.58)';ctx.fillRect(0,0,W,H);
+        const light=ctx.createRadialGradient(W/2,5*T,12,W/2,5*T,230);
+        light.addColorStop(0,'rgba(126, 69, 224, 0.28)');light.addColorStop(1,'rgba(69, 26, 133, 0)');
+        ctx.fillStyle=light;ctx.fillRect(0,2*T,W,H-2*T);
+        ctx.textAlign='center';ctx.font='bold 18px Georgia';
+        ctx.shadowColor='#ba85ff';ctx.shadowBlur=12;ctx.fillStyle='#e1caff';
+        ['Mironobot avea sanse','daca echipa isi dadea','interesul'].forEach((line,i)=>ctx.fillText(line,W/2,4.6*T+i*26));
+        ctx.restore();
+      }
       PROPS.forEach((prop,i)=>{
         const x=prop.x*T,y=prop.y*T;
-        if(prop.id==='blackjack') {
-          ctx.fillStyle='#35281e';ctx.fillRect(x+1,y+4,46,44);
-          ctx.fillStyle='#aa874c';ctx.fillRect(x,y,48,44);
-          ctx.fillStyle=prop.color;ctx.fillRect(x+3,y+3,42,38);
-          ctx.fillStyle='#fff0d0';ctx.fillRect(x+10,y+9,19,26);
-          ctx.fillStyle='#162623';ctx.textAlign='center';ctx.font='bold 12px Georgia';ctx.fillText('A♠',x+20,y+27);
-          ctx.fillStyle='#b5463d';ctx.fillRect(x+33,y+24,7,7);
+        if(prop.id==='uv-flashlight') {
+          ctx.save();ctx.translate(x+24,y+24);ctx.rotate(-0.5);
+          ctx.fillStyle='#0005';ctx.fillRect(-8,-15,20,35);
+          if(uvRef.current){
+            const beam=ctx.createLinearGradient(0,-18,0,-65);
+            beam.addColorStop(0,'rgba(188,136,255,.65)');beam.addColorStop(1,'rgba(145,83,255,0)');
+            ctx.fillStyle=beam;ctx.beginPath();ctx.moveTo(-8,-16);ctx.lineTo(-26,-65);ctx.lineTo(26,-65);ctx.lineTo(8,-16);ctx.fill();
+          }
+          ctx.fillStyle='#263236';ctx.fillRect(-7,-10,14,29);
+          ctx.fillStyle='#6d7777';ctx.fillRect(-10,-18,20,12);
+          ctx.fillStyle=uvRef.current?'#d6b6ff':'#8a68be';ctx.fillRect(-8,-20,16,5);
+          ctx.fillStyle='#ac85df';ctx.fillRect(-3,-2,6,7);
+          ctx.fillStyle='#e3caff';ctx.font='bold 7px sans-serif';ctx.textAlign='center';ctx.fillText('UV',0,14);
+          ctx.restore();
+        }
+        else if(prop.file==='legitimatie-elev-cfr.png') {
+          ctx.save();ctx.translate(x+24,y+24);ctx.rotate(-0.18);
+          ctx.fillStyle='#0004';ctx.fillRect(-19,-10,40,27);
+          if(props[i]?.complete&&props[i].naturalWidth)draw(props[i],-20,-14,40,28);
+          else {
+            ctx.fillStyle='#e4e6d3';ctx.fillRect(-20,-14,40,28);
+            ctx.fillStyle='#47775b';ctx.fillRect(-20,-14,40,6);
+            ctx.fillStyle='#829b88';ctx.fillRect(-16,-4,10,13);
+            ctx.fillStyle='#2c493a';ctx.font='bold 9px Georgia';ctx.textAlign='center';ctx.fillText('CFR',7,2);
+            ctx.fillRect(-2,5,17,1);ctx.fillRect(-2,8,13,1);
+          }
+          ctx.restore();
         }
         else if(props[i]?.complete&&props[i].naturalWidth)draw(props[i],x+3,y+3,42,42);
         else {
@@ -140,12 +189,13 @@ export default function SughitHouse({member,onExit,onGameWin,progress,Game=Black
   },[]);
 
   return <section className="interior-room personal-room" style={{'--room-accent':member.color}}>
-    <header className="interior-header"><div><p className="eyebrow">CAMERĂ PERSONALĂ · {member.name}</p><h2>{member.title}</h2><p>{near>=0?`Apasă E sau Enter: ${objects[near].label}`:'Mergi cu săgețile, WASD sau click. Explorează cele cinci obiecte.'}</p></div><button className="rpg-button" onClick={onExit}>Înapoi în oraș</button></header>
+    <p className="sr-only" role="status">{uv?'Mod UV activ. Mironobot avea sanse daca echipa isi dadea interesul':'Mod UV oprit.'}</p>
+    <header className="interior-header"><div><p className="eyebrow">CAMERĂ PERSONALĂ · {member.name}</p><h2>{member.title}</h2><p>{near>=0?`Apasă E sau Enter: ${objects[near].label}`:'Mergi cu săgețile, WASD sau click. Explorează obiectele din cameră.'}</p></div><button className="rpg-button" onClick={onExit}>Înapoi în oraș</button></header>
     <div style={{flex:1,minHeight:0,display:'flex',alignItems:'center',justifyContent:'center',background:'#152523',padding:8}}>
       <canvas ref={canvas} width={W} height={H} style={{maxWidth:'100%',maxHeight:'100%',aspectRatio:`${W}/${H}`,imageRendering:'pixelated',touchAction:'none'}} aria-label="Casa alchimistului: săgeți, WASD sau click pentru deplasare; E sau Enter pentru a inspecta obiectele"/>
     </div>
-    {detail&&<DetailDialog title={detail.label} onClose={()=>setDetail(null)}><ObjectImage image={detail.image} label={detail.label} className="object-detail-image"/><p>{detail.description}</p></DetailDialog>}
-    {game&&<DetailDialog title="Masa de blackjack" onClose={closeGame}><Game completed={progress?.won.includes(member.id)} onWin={winGame} onClose={closeGame}/></DetailDialog>}
-    {reward&&<DetailDialog title="Fragment: As de pică" onClose={()=>setReward(false)}><div className="bj-reward"><Card card={{rank:'A',suit:'♠'}}/><span>As de pică · A♠<br/><small>Fragmentul Casei alchimistului</small></span></div><p>Ai câștigat la blackjack! Asul de pică a fost adăugat în inventar. Selectează-l și folosește-l în Casa Capcană.</p><button className="rpg-button" onClick={()=>setReward(false)}>Înapoi în cameră</button></DetailDialog>}
+    {detail&&<DetailDialog title={detail.label} onClose={()=>setDetail(null)}>{!detail.hideImage&&<ObjectImage image={detail.image} label={detail.label} className="object-detail-image"/>}<p>{detail.description}</p></DetailDialog>}
+    {game&&<DetailDialog title="Repară placa Arduino arsă" onClose={closeGame}><Game completed={progress?.won.includes(member.id)} onWin={winGame} onClose={closeGame}/></DetailDialog>}
+    {reward&&<DetailDialog title="Fragment: Placă Arduino reparată" onClose={()=>setReward(false)}><ObjectImage image={imageFor(PROPS[1])} label="Placă Arduino reparată" className="object-detail-image"/><p>Ai reparat Arduino-ul! Plăcuța este fragmentul camerei tale și a fost adăugată în inventar. Selecteaz-o și folosește-o în Casa Capcană.</p><button className="rpg-button" onClick={()=>setReward(false)}>Înapoi în cameră</button></DetailDialog>}
   </section>;
 }

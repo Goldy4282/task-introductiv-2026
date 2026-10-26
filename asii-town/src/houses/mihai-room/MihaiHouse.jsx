@@ -6,6 +6,7 @@ import { ArrowLeft, Power, ScanLine, Rocket, X, Lock, Radio, Bug } from 'lucide-
   Se servește de la /mihai/cosmic-room.png (respectă `base` din vite.config dacă există).
 */
 const IMG = `${(typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.BASE_URL) || '/'}mihai/cosmic-room.png`;
+const BANANA = `${import.meta.env.BASE_URL}mihai/banana.png`;
 
 const TOTAL = 8;
 const NEEDS_POWER = ['tank', 'champ', 'desk', 'galaxy', 'drawer'];
@@ -75,7 +76,7 @@ export default function MihaiHouse({ member, progress, dispatch, onExit, notify,
   const [snap, setSnap] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const [found, setFound] = useState(false);
-  const [decrypted, setDecrypted] = useState(false);
+  const [decrypted, setDecrypted] = useState(() => Boolean(progress?.won?.includes(member?.id || 'maker')));
   const [gameOpen, setGameOpen] = useState(false);
   const [logs, setLogs] = useState([]);
   const [debug, setDebug] = useState(false);
@@ -202,8 +203,8 @@ export default function MihaiHouse({ member, progress, dispatch, onExit, notify,
     if (winRef.current) return;
     winRef.current = true;
     setDecrypted(true);
-    toast('Fragment decriptat!', 'ok');
-    safeNotify('Fragment decriptat!');
+    toast('Ai câștigat o banană!', 'ok');
+    safeNotify('Banana este fragmentul camerei lui Mihai. O găsești în inventar.');
     if (typeof onGameWin === 'function') onGameWin();
   }, [onGameWin, toast, safeNotify]);
 
@@ -214,7 +215,7 @@ export default function MihaiHouse({ member, progress, dispatch, onExit, notify,
   };
 
   const count = Object.keys(seen).length;
-  const status = decrypted ? 'FRAGMENT DECRIPTAT' : on ? `MISIUNE ACTIVĂ · ${count}/${TOTAL} INSPECTATE` : 'STANDBY';
+  const status = decrypted ? 'FRAGMENT OBȚINUT · BANANĂ' : on ? `MISIUNE ACTIVĂ · ${count}/${TOTAL} INSPECTATE` : 'STANDBY';
 
   const renderModal = () => {
     switch (modal) {
@@ -294,7 +295,7 @@ export default function MihaiHouse({ member, progress, dispatch, onExit, notify,
             <span className="tag">COMPARTIMENT ASCUNS</span>
             <h2>Cutia de date</h2>
             {decrypted ? (
-              <div className="mh-fragment">Fragment decriptat: „Coordonate: acolo unde un șurub strâns bine și un cer fără margini lucrează la același proiect.”</div>
+              <div className="mh-fragment"><img src={BANANA} alt="Banană, fragmentul lui Mihai" style={{display:'block',width:180,maxWidth:'100%',maxHeight:'30vh',objectFit:'contain',margin:'0 auto 12px'}}/>Fragment obținut: Banană. Selecteaz-o din inventar și folosește-o în Casa Capcană.</div>
             ) : (
               <>
                 <div className="mh-term"><span className="mh-cipher">▓▒░ 7F·A3·C1 ░▒▓ 09·E4·B2 ▓▒░ 5D·11·8C ░▒▓</span></div>

@@ -1,0 +1,22 @@
+.object-modal:has(.arduino-game) { width:min(860px,calc(100vw - 24px));height:min(620px,calc(100dvh - 24px));max-height:calc(100dvh - 24px);box-sizing:border-box;padding:12px;overflow:hidden; }
+.object-modal:has(.arduino-game)[open] { display:flex;flex-direction:column; }
+.object-modal:has(.arduino-game)>.eyebrow { display:none; }
+.object-modal:has(.arduino-game)>h2 { margin:0 24px 8px 0;font-size:22px; }
+.arduino-game { flex:1;min-height:0;display:flex;flex-direction:column;gap:8px; }
+.object-modal .arduino-game p { margin:0;font-size:13px;line-height:1.4; }
+.arduino-game svg { display:block;flex:1;width:100%;min-height:0;touch-action:none;user-select:none; }
+.arduino-actions { display:flex;flex-wrap:wrap;gap:6px; }
+.arduino-feedback { padding:8px;border-left:3px solid #92aa7a;background:#92aa7a15; }
+.arduino-failed { color:#ffaaa0; }.arduino-won .arduino-feedback { color:#b6ef9e; }
+.arduino-pin { cursor:crosshair; }.arduino-pin:focus-visible { outline:2px solid #fff0cf; }
+.arduino-wire-hit { fill:none;stroke:transparent;stroke-width:18;cursor:pointer;pointer-events:stroke; }
+.arduino-removal { display:flex;gap:10px;flex-wrap:wrap;min-height:18px;font-size:12px; }
+.arduino-removal button { cursor:pointer;text-decoration:underline; }
+.arduino-smoke { animation:arduino-smoke 1.1s ease-out both; }
+.arduino-won .arduino-led { animation:arduino-glow 1.2s ease-in-out infinite alternate; }
+.arduino-fragment { text-align:center;font-size:80px;color:#dfd9ae; }
+@keyframes arduino-smoke { from { opacity:.8;transform:translateY(0); } to { opacity:0;transform:translateY(-65px); } }
+@keyframes arduino-glow { from { filter:drop-shadow(0 0 3px #a8ff87); } to { filter:drop-shadow(0 0 12px #a8ff87); } }
+@media(max-width:480px) { .arduino-actions .rpg-button { flex:1 1 125px;padding:0 4px; } }
+@media(max-height:450px) { .arduino-game { gap:4px; }.object-modal .arduino-game p { font-size:11px; }.arduino-actions .rpg-button { min-height:30px;padding:0 4px; } }
+@media(prefers-reduced-motion:reduce) { .arduino-smoke,.arduino-won .arduino-led { animation:none; } }

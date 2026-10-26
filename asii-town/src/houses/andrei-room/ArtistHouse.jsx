@@ -475,10 +475,9 @@ if (k === 'e' || k === 'Enter') {
 
  function win(){
   onGameWin();
-  if (dispatch) dispatch({type:'collect', id:'ursus:artist'});
   setGame(false);
   setUrsusReward(true);
-  notify('Ai completat mini-jocul și ai primit o sticlă Ursus! O găsești în inventar.');
+  notify('Ai completat mini-jocul! Berea Ursus este fragmentul camerei, adăugat în inventar.');
  }
  return <section className="interior-room personal-room" style={{'--room-accent':member.color}}>
   <header className="interior-header"><div><p className="eyebrow">CAMERĂ PERSONALĂ · {member.name}</p><h2>{member.title}</h2><p>{paintingNearby?'Apasă E sau Enter pentru a privi tabloul.':near>=0?`Apasă E sau Enter: ${objects[near]?.label}`:'Mergi cu săgețile sau click. Explorează camera.'}</p></div>

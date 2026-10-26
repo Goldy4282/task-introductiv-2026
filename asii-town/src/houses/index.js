@@ -3,14 +3,14 @@ import MihaiHouse from './mihai-room/MihaiHouse';
 import MihaiGame from './mihai-room/MihaiGame';
 import ArtistHouse from './andrei-room/ArtistHouse';
 import SughitHouse from './sughit-house/SughitHouse';
-import BlackjackGame from './sughit-house/BlackjackGame';
+import ArduinoGame from './sughit-house/ArduinoGame';
 import AlbumSortingGame from './andrei-room/AlbumSortingGame';
 import {MEMBERS} from './content';
 // Each participant imports their own Room and Game here.
 export const HOUSE_MODULES={
  guest:{Room:ExampleHouse,Game:null},
  maker:{Room:MihaiHouse,Game:MihaiGame},
- reader:{Room:SughitHouse,Game:BlackjackGame},
+ reader:{Room:SughitHouse,Game:ArduinoGame},
  artist:{Room:ArtistHouse,Game:AlbumSortingGame},
 };
 export const HOUSES=[
