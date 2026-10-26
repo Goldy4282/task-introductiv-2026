@@ -70,5 +70,6 @@ export const MEMBERS = [
     ]
  },
 ];
+MEMBERS[0]={id:'guest',name:'Dragoș',title:'Laboratorul circuitelor defecte',color:'#38d9c4',fragment:'Circuit reparat',fragmentLabel:'Modul half-adder',hint:'Suma este 1 când intrările diferă; transportul este 1 doar când ambele sunt 1.',quote:'Un circuit corect trebuie să treacă fiecare test.',objects:[['Osciloscopul','Monitorizează semnalele digitale.'],['Tabela de adevăr','Patru combinații de intrări definesc un sumator pe un bit.'],['Placa de prototip','Conexiunile logice pot fi reconfigurate.'],['Setul de porți','AND, OR, XOR și NOT sunt disponibile.'],['Modulul de procesare','Așteaptă un circuit verificat.']]};
 export const TEAM_PROFILE='Patru feluri de a privi lumea: explorare, invenție, lectură și artă. Îi unește curiozitatea și dorința de a construi împreună. Îi diferențiază drumurile, instrumentele și poveștile prin care ajung la o idee.';
 export const normalize=value=>String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toUpperCase().replace(/\s+/g,' ');
