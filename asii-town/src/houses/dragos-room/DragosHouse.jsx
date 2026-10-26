@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Activity, BookOpen, Cpu, Lightbulb, Package, Wrench, Terminal, CheckCircle2 } from 'lucide-react';
 import DetailDialog from '../../components/DetailDialog';
 import './dragos.css';
@@ -12,6 +12,13 @@ const ROOM_OBJECTS = [
   { id: 'computer', label: 'Mainframe', hint: 'System diagnostics', x: 84, y: 62, Icon: Cpu },
   { id: 'lamp', label: 'Room lights', hint: 'Toggle lighting', x: 80, y: 23, Icon: Lightbulb },
   { id: 'tile', label: 'Loose floor tile', hint: 'Inspect the floor', x: 66, y: 89, Icon: Package },
+];
+
+const BOOT_MESSAGES = [
+  {title:'POWER BUS RECONNECTED',line:'> power: restored · voltage: nominal'},
+  {title:'INITIALIZING LOGIC ARRAY',line:'> 2 logic gates detected · signal paths online'},
+  {title:'VERIFYING ARITHMETIC UNIT',line:'> half-adder: SUM / CARRY · 4/4 tests passed'},
+  {title:'SYSTEM ONLINE',line:'> POST complete · welcome to ASII computer laboratory'},
 ];
 
 function LabScene({ powered, won }) {
@@ -126,6 +133,14 @@ export default function DragosHouse({ member, Game, progress, dispatch, onGameWi
   const [playing, setPlaying] = useState(false);
   const [lights, setLights] = useState(true);
   const [tileOpen, setTileOpen] = useState(false);
+  const [bootStage, setBootStage] = useState(-1);
+  useEffect(()=>{
+    if (bootStage < 0) return undefined;
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const duration = reduced ? 180 : bootStage===3 ? 1800 : 850;
+    const timer = window.setTimeout(()=>setBootStage(stage=>stage>=3?-1:stage+1),duration);
+    return ()=>window.clearTimeout(timer);
+  },[bootStage]);
   const won = progress.won.includes(member.id);
   const collected = progress.inventory.includes('keepsake:' + member.id);
 
@@ -144,23 +159,37 @@ export default function DragosHouse({ member, Game, progress, dispatch, onGameWi
   function complete() {
     onGameWin();
     setPlaying(false);
-    notify('ALU restored. The repaired-module fragment is now in your inventory.');
+    setLights(true);
+    setBootStage(0);
+    notify('Half-adder verified. Mainframe reboot sequence initiated.');
   }
 
-  return <section className="interior-room dl-room">
-    <header className="interior-header dl-room-header"><div className="dl-room-heading"><span className="dl-overline">ASII / INTERACTIVE ENVIRONMENT · ROOM 01</span><h2>THE BROKEN COMPUTER LABORATORY</h2><p>Someone sabotaged the arithmetic unit. Find the repair station and rebuild the circuit.</p></div>
-      <div className="dl-room-controls"><span className={'dl-room-health ' + (won?'repaired':'damaged')}><Activity size={16}/>{won?'SYSTEM REPAIRED':'SYSTEM FAILURE'}</span><button className="dl-back-button" onClick={onExit}><ArrowLeft size={18}/> Leave room</button></div></header>
+  const booting = bootStage >= 0;
+  const sceneOnline = won && (!booting || bootStage===3);
+  return <section className={'interior-room dl-room ' + (won?'dl-room-repaired ':'') + (booting?'dl-room-booting':'')}>
+    <header className="interior-header dl-room-header"><div className="dl-room-heading"><span className="dl-overline">ASII / INTERACTIVE ENVIRONMENT · ROOM 01</span><h2>THE BROKEN COMPUTER LABORATORY</h2><p>{won?'The arithmetic unit has been restored. All systems are operating normally.':'Someone sabotaged the arithmetic unit. Find the repair station and rebuild the circuit.'}</p></div>
+      <div className="dl-room-controls"><span className={'dl-room-health ' + (won?'repaired':'damaged')}><Activity size={16}/>{booting?'REBOOTING':won?'SYSTEM REPAIRED':'SYSTEM FAILURE'}</span><button className="dl-back-button" onClick={onExit}><ArrowLeft size={18}/> Leave room</button></div></header>
     <div className="dl-room-content"><div className="dl-room-view">
-      <div className="dl-room-visual"><LabScene powered={lights} won={won}/>
-        {ROOM_OBJECTS.map(object => <button key={object.id} className={'dl-room-hotspot dl-hotspot-' + object.id} style={{left:object.x+'%',top:object.y+'%'}} onClick={()=>inspect(object)} title={object.hint}><object.Icon size={16}/><span>{object.label}</span>{object.id==='workbench'&&<strong>INTERACT</strong>}</button>)}
+      <div className="dl-room-visual"><LabScene powered={lights} won={sceneOnline}/>
+        {ROOM_OBJECTS.map(object => <button key={object.id} className={'dl-room-hotspot dl-hotspot-' + object.id} style={{left:object.x+'%',top:object.y+'%'}} disabled={booting} onClick={()=>inspect(object)} title={object.hint}><object.Icon size={16}/><span>{object.label}</span>{object.id==='workbench'&&<strong>INTERACT</strong>}</button>)}
         <div className="dl-scene-corner top-left">LAB / 07 <span>◈</span> RESTRICTED</div><div className="dl-scene-corner bottom-left">LOC. 01 — COMPUTER ENGINEERING</div>
         <div className="dl-scene-corner bottom-right">SCENE 01 / INTERACTIVE</div>
+        {booting && <div className={'dl-reboot-overlay ' + (bootStage===3?'dl-boot-success':'')} role="status" aria-live="polite">
+          <div className="dl-reboot-terminal">
+            <div className="dl-reboot-topline"><Cpu size={22}/><span>MAINFRAME POST // {String(bootStage+1).padStart(2,'0')}/04</span></div>
+            <div className="dl-reboot-ring"><Activity size={44}/></div>
+            <strong>{BOOT_MESSAGES[bootStage].title}</strong>
+            <p>{BOOT_MESSAGES[bootStage].line}</p>
+            <div className="dl-reboot-meter"><div style={{width:((bootStage+1)*25)+'%'}} /></div>
+            <div className="dl-reboot-bottom"><span>STATUS: {bootStage===3?'OPERATIONAL':'BOOTING'}</span><button onClick={()=>setBootStage(-1)}>{bootStage===3?'Continue':'Skip animation'}</button></div>
+          </div>
+        </div>}
       </div>
-      <div className="dl-room-footer"><div><span className="dl-footer-dot"/><strong>EXPLORE THE LAB</strong><small>Click objects to investigate. The repair station is on the center desk.</small></div><button onClick={()=>setPlaying(true)}><Terminal size={17}/> Open repair console</button></div>
+      <div className="dl-room-footer"><div><span className="dl-footer-dot"/><strong>{won?'REPAIR COMPLETE':'EXPLORE THE LAB'}</strong><small>{won?'Four truth-table checks passed. The saved circuit can be inspected.':'Click objects to investigate. The repair station is on the center desk.'}</small></div><button disabled={booting} onClick={()=>setPlaying(true)}><Terminal size={17}/> {won?'Inspect restored circuit':'Open repair console'}</button></div>
     </div>
-    <aside className="dl-room-sidebar"><div className="dl-side-index">INCIDENT REPORT / #2046</div><h3>A computer in need of repair.</h3><p>A suspicious failure has disabled the laboratory's half-adder. Inspect the room, then reconstruct the logic circuit from its truth table.</p><div className="dl-sidebar-divider"/><div className="dl-objectives"><span>YOUR OBJECTIVES</span><div className="dl-objective"><span className={won?'done':''}>{won?<CheckCircle2 size={16}/>: '01'}</span><p>Locate the repair station</p></div><div className="dl-objective"><span className={won?'done':''}>{won?<CheckCircle2 size={16}/>: '02'}</span><p>Install two logic gates</p></div><div className="dl-objective"><span className={won?'done':''}>{won?<CheckCircle2 size={16}/>: '03'}</span><p>Pass all four test cases</p></div></div><div className="dl-sidebar-divider"/><div className="dl-secret-status"><small>HIDDEN OBJECT</small>{tileOpen&&!collected?<button onClick={()=>{dispatch({type:'collect',id:'keepsake:'+member.id});notify('Hidden keepsake collected.');}}>Collect hidden laboratory keepsake</button>:<p>{collected?'Keepsake collected':'An unusual floor tile catches your eye.'}</p>}</div></aside>
+    <aside className="dl-room-sidebar"><div className="dl-side-index">INCIDENT REPORT / #2046</div><h3>{won?'The laboratory is back online.':'A computer in need of repair.'}</h3><p>{won?'The processor passed all four diagnostic cases. The repaired circuit remains saved in the workbench, ready to inspect.':'A suspicious failure has disabled the laboratory\'s half-adder. Inspect the room, then reconstruct the logic circuit from its truth table.'}</p><div className="dl-sidebar-divider"/><div className="dl-objectives"><span>YOUR OBJECTIVES</span><div className="dl-objective"><span className={won?'done':''}>{won?<CheckCircle2 size={16}/>: '01'}</span><p>Locate the repair station</p></div><div className="dl-objective"><span className={won?'done':''}>{won?<CheckCircle2 size={16}/>: '02'}</span><p>Install two logic gates</p></div><div className="dl-objective"><span className={won?'done':''}>{won?<CheckCircle2 size={16}/>: '03'}</span><p>Pass all four test cases</p></div></div><div className="dl-sidebar-divider"/><div className="dl-secret-status"><small>HIDDEN OBJECT</small>{tileOpen&&!collected?<button onClick={()=>{dispatch({type:'collect',id:'keepsake:'+member.id});notify('Hidden keepsake collected.');}}>Collect hidden laboratory keepsake</button>:<p>{collected?'Keepsake collected':'An unusual floor tile catches your eye.'}</p>}</div></aside>
     </div>
     {detail&&<DetailDialog title={detail.label} onClose={()=>setDetail(null)}><p>{detail.description}</p></DetailDialog>}
-    {playing&&Game&&<DetailDialog title="HALF-ADDER REPAIR STATION" onClose={()=>setPlaying(false)}><Game member={member} onWin={complete} onClose={()=>setPlaying(false)}/></DetailDialog>}
+    {playing&&Game&&<DetailDialog title="HALF-ADDER REPAIR STATION" onClose={()=>setPlaying(false)}><Game member={member} progress={progress} dispatch={dispatch} onWin={complete} onClose={()=>setPlaying(false)}/></DetailDialog>}
   </section>;
 }

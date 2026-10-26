@@ -16,18 +16,6 @@ export default function App(){
  const houseId=progress.room,House=HOUSE_COMPONENTS[houseId],Game=HOUSE_GAMES[houseId],current=HOUSES.find(h=>h.id===houseId),secretOpen=canOpenSecret(progress),allWon=MEMBERS.every(m=>progress.won.includes(m.id));
  useEffect(()=>{try{localStorage.setItem(STORAGE,JSON.stringify(progress));}catch{setNotice('Salvarea locală nu este disponibilă. Progresul se păstrează în această sesiune.');}},[progress]);
  useEffect(()=>{if(!notice)return;const timer=setTimeout(()=>setNotice(''),6500);return()=>clearTimeout(timer);},[notice]);
- // Scurtătură temporară până când Colegul 1 își finalizează casa.
- useEffect(()=>{
-  function grantGuestFragment(event){
-   if(event.key.toLowerCase()!=='k'||event.repeat||event.ctrlKey||event.altKey||event.metaKey)return;
-   if(event.target instanceof Element&&event.target.closest('input,textarea,select,[contenteditable]:not([contenteditable="false"])'))return;
-   event.preventDefault();
-   dispatch({type:'win',id:'guest'});
-   setNotice('Ai primit fragmentul Colegului 1: cartonașul de traseu 24.');
-  }
-  window.addEventListener('keydown',grantGuestFragment);
-  return()=>window.removeEventListener('keydown',grantGuestFragment);
- },[]);
  function enter(id){if(id==='secret'&&!secretOpen){setNotice('Ușă blocată: câștigă toate mini-jocurile personale și scapă din Casa Capcană.');return;}if(id==='trap'&&!hasFragments(progress)){setNotice('Înainte de capcană, adună fragmentele din toate cele patru camere personale.');return;}dispatch({type:'visit',id});setTargetHouse(null);}
  const shared={progress,dispatch,Game,onGameWin:()=>{dispatch({type:'win',id:houseId});setNotice('Ai câștigat un fragment!');},onExit:()=>dispatch({type:'exit'}),notify:setNotice,selectedItem,onUse:()=>setSelectedItem(null)};
  const inventory=progress.inventory.map(id=>{if(id==='key:secret')return {id,label:'Cheia Casei Secrete',description:'Obținută după evadarea din temniță. Deschide Casa Secretă.'};const [type,owner]=id.split(':'),m=MEMBERS.find(m=>m.id===owner);return m?{id,image:type==='fragment'?fragmentImages[owner]:undefined,label:type==='fragment'?m.fragmentLabel||`Fragment · ${m.name}`:`Suvenir · ${m.name}`,description:type==='fragment'?`Fragment câștigat în ${m.title}: ${m.fragment}. Selectează-l și folosește-l în Casa Capcană.`:`Suvenir ascuns sub covor în ${m.title}. Poate deschide sertarul acelei camere.`}:null;}).filter(Boolean);
