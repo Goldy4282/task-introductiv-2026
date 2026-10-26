@@ -1,27 +1,34 @@
 ﻿import {MEMBERS} from '../houses/content';
+import {GAME_IDS,SECRET_ITEMS,hasFragments,mechanismsReady,gamesReady,validGame,secretCorrect} from '../houses/dungeon/logic';
 // v3 deliberately starts without the victories granted by the removed demo games.
 export const STORAGE='asii-town-adventure-v3';
-export const initialProgress={room:null,visited:[],won:[],inventory:[],hints:0,escaped:false,secretAnswers:{},secretSubmitted:false};
+export const initialProgress={room:null,visited:[],won:[],inventory:[],hints:0,escaped:false,trapSlots:[],trapGames:[],secretAnswers:{},secretSubmitted:false};
 // Salvarile vechi pot conține atât tokenul Ursus, cât și fragmentul aceleiași camere.
 export const normalizeInventory=items=>[...new Set(items.map(id=>id==='ursus:artist'?'fragment:artist':id))];
-export function canOpenSecret(p){return MEMBERS.every(m=>p.won.includes(m.id))&&p.escaped;}
+export function canOpenSecret(p){return hasFragments(p)&&p.escaped&&p.inventory.includes('key:secret');}
 export function progressReducer(p,a){
  switch(a.type){
- case 'visit':if((p.room==='trap'&&!p.escaped)||(a.id==='secret'&&!canOpenSecret(p))||(a.id==='trap'&&!MEMBERS.every(m=>p.won.includes(m.id))))return p;return {...p,room:a.id,visited:[...new Set([...p.visited,a.id])]};
+ case 'visit':if((p.room==='trap'&&!p.escaped)||(a.id==='secret'&&!canOpenSecret(p))||(a.id==='trap'&&!hasFragments(p)))return p;return {...p,room:a.id,visited:[...new Set([...p.visited,a.id])]};
  case 'exit':return p.room==='trap'&&!p.escaped?p:{...p,room:null};
  case 'collect':return p.inventory.includes(a.id)?p:{...p,inventory:[...p.inventory,a.id]};
  case 'win':if(!MEMBERS.some(m=>m.id===a.id)||p.won.includes(a.id))return p;return {...p,won:[...p.won,a.id],inventory:normalizeInventory([...p.inventory,'fragment:'+a.id])};
  case 'hint':return p.hints>=3?p:{...p,hints:p.hints+1};
- case 'escape':if(p.room!=='trap'||p.escaped||!MEMBERS.every(m=>p.won.includes(m.id)))return p;return {...p,escaped:true,inventory:[...new Set([...p.inventory,'fragment:final'])]};
- case 'attribute':return !canOpenSecret(p)||p.secretSubmitted?p:{...p,secretAnswers:{...p.secretAnswers,[a.id]:a.owner}};
- case 'submit':return canOpenSecret(p)&&MEMBERS.every(m=>[0,1].every(i=>p.secretAnswers[m.id+':'+i]))?{...p,secretSubmitted:true}:p;
+ case 'trapInsert':if(p.room!=='trap'||!hasFragments(p)||!MEMBERS.some(m=>m.id===a.id)||a.item!=='fragment:'+a.id||p.trapSlots.includes(a.id))return p;return {...p,trapSlots:[...p.trapSlots,a.id]};
+ case 'trapSolve':if(p.room!=='trap'||!mechanismsReady(p)||!hasFragments(p)||p.trapGames.includes(a.id)||!validGame(a.id,a.data))return p;return {...p,trapGames:[...p.trapGames,a.id]};
+ case 'escape':if(p.room!=='trap'||p.escaped||!hasFragments(p)||!mechanismsReady(p)||!gamesReady(p))return p;return {...p,escaped:true,inventory:[...new Set([...p.inventory,'key:secret'])]};
+ case 'attribute':return p.room!=='secret'||!canOpenSecret(p)||p.secretSubmitted||!SECRET_ITEMS.some(i=>i.id===a.id)||!MEMBERS.some(m=>m.id===a.owner)?p:{...p,secretAnswers:{...p.secretAnswers,[a.id]:a.owner}};
+ case 'submit':return p.room==='secret'&&canOpenSecret(p)&&secretCorrect(p)?{...p,secretSubmitted:true}:p;
  default:return p;
  }
 }
 export function loadProgress(){try{
  const raw=JSON.parse(localStorage.getItem(STORAGE));if(!raw||typeof raw!=='object')return initialProgress;
  const won=Array.isArray(raw.won)?MEMBERS.filter(m=>raw.won.includes(m.id)).map(m=>m.id):[];
- const escaped=won.length===MEMBERS.length&&raw.escaped===true;
  const inventory=Array.isArray(raw.inventory)?normalizeInventory(raw.inventory.filter(x=>typeof x==='string')):[];
- return {...initialProgress,room:raw.room==='trap'&&!escaped&&won.length===MEMBERS.length?'trap':null,visited:Array.isArray(raw.visited)?raw.visited.filter(x=>typeof x==='string'):[],won,inventory:[...new Set([...inventory,...won.map(id=>'fragment:'+id),...(escaped?['fragment:final']:[])])],hints:Number.isInteger(raw.hints)?Math.max(0,Math.min(3,raw.hints)):0,escaped,secretAnswers:raw.secretAnswers&&typeof raw.secretAnswers==='object'&&!Array.isArray(raw.secretAnswers)?raw.secretAnswers:{},secretSubmitted:Boolean(raw.secretSubmitted)&&escaped};
+ const trapSlots=Array.isArray(raw.trapSlots)?MEMBERS.filter(m=>raw.trapSlots.includes(m.id)).map(m=>m.id):[];
+ const trapGames=Array.isArray(raw.trapGames)?GAME_IDS.filter(id=>raw.trapGames.includes(id)):[];
+ const base={...initialProgress,won,inventory:[...new Set([...inventory.filter(id=>id!=='fragment:final'&&id!=='key:secret'),...won.map(id=>'fragment:'+id)])],trapSlots,trapGames};
+ const escaped=raw.escaped===true&&hasFragments(base)&&mechanismsReady(base)&&gamesReady(base);
+ const secretAnswers=Object.fromEntries(SECRET_ITEMS.filter(i=>MEMBERS.some(m=>m.id===raw.secretAnswers?.[i.id])).map(i=>[i.id,raw.secretAnswers[i.id]]));
+ return {...base,room:raw.room==='trap'&&!escaped&&hasFragments(base)?'trap':null,visited:Array.isArray(raw.visited)?raw.visited.filter(x=>typeof x==='string'):[],inventory:[...base.inventory,...(escaped?['key:secret']:[])],hints:Number.isInteger(raw.hints)?Math.max(0,Math.min(3,raw.hints)):0,escaped,secretAnswers,secretSubmitted:Boolean(raw.secretSubmitted)&&escaped&&secretCorrect({secretAnswers})};
  }catch{return initialProgress;}}

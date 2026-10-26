@@ -1,5 +1,6 @@
 import ExampleHouse from './ExampleHouse';
 import MihaiHouse from './mihai-room/MihaiHouse';
+import ExplorerGame from './ExplorerGame';
 import MihaiGame from './mihai-room/MihaiGame';
 import ArtistHouse from './andrei-room/ArtistHouse';
 import SughitHouse from './sughit-house/SughitHouse';
@@ -8,7 +9,7 @@ import AlbumSortingGame from './andrei-room/AlbumSortingGame';
 import {MEMBERS} from './content';
 // Each participant imports their own Room and Game here.
 export const HOUSE_MODULES={
- guest:{Room:ExampleHouse,Game:null},
+ guest:{Room:ExampleHouse,Game:ExplorerGame},
  maker:{Room:MihaiHouse,Game:MihaiGame},
  reader:{Room:SughitHouse,Game:ArduinoGame},
  artist:{Room:ArtistHouse,Game:AlbumSortingGame},

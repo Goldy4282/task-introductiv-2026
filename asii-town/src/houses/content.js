@@ -7,6 +7,7 @@ export const MEMBERS = [
     title:'Casa exploratorului',
     color:'#8fae83',
     fragment:'24',
+    fragmentLabel:'Cartonaș de traseu · 24',
     hint:'Patru trasee sunt notate pe hartă: 2, 4, 1, 3.',
     quote:'Drumul bun începe cu o întrebare.',
     objects:[
@@ -54,7 +55,7 @@ export const MEMBERS = [
  },
  {
     id:'artist',
-    name:'Colegul 4',
+    name:'Andrei',
     title:'Casa artistului',
     color:'#bc8c83',
     fragment:'Bere Ursus',
